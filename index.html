@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title> Visualization </title>
+    <title> Scalar Field Grapher </title>
     <style>
       #leftside  {
         width: 300px;
@@ -141,6 +141,9 @@
             c.rect(10 + i*sizePixels, 610 - (j+1)*sizePixels, sizePixels, sizePixels);
             c.fillStyle = colorPoint(x_point, y_point);
             c.fill();
+            c.lineWidth = 1;
+            c.strokeStyle = colorPoint(x_point, y_point);
+            c.stroke();
           }
           i = 0;
         }
