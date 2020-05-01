@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> Visualization </title>
+    <style>
+      #leftside  {
+        width: 300px;
+        height: 690px;
+        background: rgb(200,200,200);
+        float: left;
+      }
+      #rightside {
+        width: 270px;
+        height: 690px;
+        background: rgb(200,200,200);
+        float: right;
+        padding-left: 30px;
+      }
+      #heading	{
+        height: 70px;
+        width: 100%;
+        background: rgb(180,180,180);
+      }
+      #above		{
+        height: 70px;
+        width: 100%;
+        background: rgb(220,220,220);
+        padding-top: 10px;
+      }
+      #middle		{
+        height: 620px;
+        width: 100%;
+        background: rgb(240,240,240);
+      }
+      canvas {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          padding-left: 0;
+          padding-right: 0;
+          width: 620px;
+          height: 620px;
+      }
+      h1 {
+        padding-top: 20px;
+        text-align: center;
+        margin-top: 0;
+      }
+      input[type="range"] {
+        margin-top: 110px;
+        margin-left: 10px;
+      }
+      input[type="number"] {
+        margin-top: 20px;
+        margin-left: 10px;
+        width: 60px;
+      }
+      input[type="text"] {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      #BTN_graph {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="heading">
+      <h1>Scalar Field Grapher<h1>
+    </div>
+    <div id="leftside">
+    </div>
+    <div id="rightside">
+      <h2>Options panel</h2> <br>
+      Play with the values and see the result! <br>
+      sharpness: <input id="INPT_sharpness" type="range"></input><br>
+      sidelength: <input id="INPT_sidelength" type="number" value ="100"></input> <br>
+      color-range: <input id="INPT_color-range" type="number" value="100"></input> <br>
+      x-position: <input id="INPT_x-position" type="number" value="0"></input> <br>
+      y-position: <input id="INPT_y-position" type="number" value="0"></input>
+    </div>
+    <div id="above">
+      <input id="INPT_equation" type="text"></input>
+      <button id="BTN_graph"> ! GRAPH ! </button>
+    </div>
+    <div id="middle">
+        <canvas id = "canvas"></canvas>
+    </div>
+    <script>
+      var canvas = document.getElementById("canvas");
+      var c = canvas.getContext("2d");
+      canvas.width = 620;
+      canvas.height = 620;
+      console.log(canvas);
+
+      var equation;
+      var x_position;
+      var y_position;
+      var sharpness;
+      var sidelength;
+      var color_range;
+      document.getElementById("BTN_graph").addEventListener("click", function() {
+        equation = document.getElementById("INPT_equation").value;
+        x_position = document.getElementById("INPT_x-position").value;
+        y_position = document.getElementById("INPT_y-position").value;
+        sharpness = document.getElementById("INPT_sharpness").value;
+        sidelength = document.getElementById("INPT_sidelength").value;
+        color_range = document.getElementById("INPT_color-range").value;
+        console.log("equation: " + equation);
+        console.log("x-position: " + x_position);
+        console.log("y-position: " + y_position);
+        console.log("sharpness: " + sharpness);
+        console.log("sidelength: " + sidelength);
+        console.log("color-range: " + color_range);
+        console.log("------------------------------");
+        c.clearRect(0, 0, canvas.width, canvas.height);
+        graph_field();
+        graph_axes();
+      })
+
+      function graph_field() {
+        var sizePixels = 600/sharpness;
+        for (var j = 0; j < sharpness; j++) {
+          for (var i = 0; i < sharpness; i++) {
+            // using position on page to produce x,y coordinates
+            var x_point = x_position - (sidelength/2) + (1/2)*(sidelength/sharpness) + (sidelength/sharpness) * i;
+            var y_point = y_position - (sidelength/2) + (1/2)*(sidelength/sharpness) + (sidelength/sharpness) * j;
+            //console.log("f(" + x_point + ", " + y_point + ") = " + evalPoint(x_point, y_point));
+            c.beginPath();
+            c.rect(10 + i*sizePixels, 610 - (j+1)*sizePixels, sizePixels, sizePixels);
+            c.fillStyle = colorPoint(x_point, y_point);
+            c.fill();
+          }
+          i = 0;
+        }
+      }
+
+      graph_axes();
+      function graph_axes() {
+          c.beginPath();
+          // four small rectangles hinting at the center
+          c.rect(309, 0, 2, 20);
+          c.rect(309, 600, 2, 20);
+          c.rect(0, 309, 20, 2);
+          c.rect(600, 309, 20, 2);
+          //  frame for the field
+          c.rect(0, 0, 2, 620);
+          c.rect(0, 618, 620, 2);
+          c.rect(618, 0, 2, 620);
+          c.rect(0, 0, 620, 2);
+
+          c.fillStyle = "black";
+          c.fill();
+      }
+
+      // input: x,y position on the graph
+      function evalPoint(a,b) {
+        var x = a;
+        var y = b;
+        return eval(equation);
+      }
+       // output: value of f(x,y), where f depends on user input
+
+      // input: x,y position on the graph
+      function colorPoint(x_new, y_new) {
+        if (evalPoint(x_new, y_new) > 0) {
+          return rgb(255, 255*(1-evalPoint(x_new, y_new)/color_range), 255*(1-evalPoint(x_new, y_new)/color_range));
+        }
+        if (evalPoint(x_new, y_new) < 0) {
+          return rgb(255*(1+evalPoint(x_new, y_new)/color_range), 255*(1+evalPoint(x_new, y_new)/color_range), 255);
+        }
+        else {
+          return rgb(255,255,255);
+        }
+      } // output: rgb()
+
+      // input: rgb()
+      function rgb(r, g, b) {
+        return "rgb("+r+","+g+","+b+")";
+      } // output: "rgb()"
+    </script>
+  </body>
+
+</html>
